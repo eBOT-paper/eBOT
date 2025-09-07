@@ -16,6 +16,31 @@ On each node, run the following command to install all required dependencies for
 
 ---
 
+## Python Dependencies
+
+If Python 3 is not installed, we recommend using **Python 3.9**.
+The **server-agent** requires the `websockets` package for communication. Install it as follows:
+
+```bash
+sudo apt install python3-pip
+pip3 install websockets
+```
+
+---
+
+## Topology Configuration
+
+1. Edit the node description in `main_config.json`.
+2. Generate the system configuration file with:
+
+   ```bash
+   python3 gen_system_config.py
+   ```
+
+   This will create or update `system_config.json`.
+
+---
+
 ## Configuration
 
 ### Coordinator Node
@@ -36,31 +61,6 @@ python3 agent.py
 ```
 
 Once all nodes are connected, select **1. Configuration** from the coordinator to automatically propagate the configuration across all nodes.
-
----
-
-## Python Dependencies
-
-If Python 3 is not installed, we recommend using **Python 3.9**.
-The **server-agent** requires the `websockets` package for communication. Install it as follows:
-
-```bash
-sudo apt install python3-pip
-pip3 install websockets
-```
-
----
-
-## Topology Configuration
-
-1. Edit the node description in `nodes.json`.
-2. Generate the system configuration file with:
-
-   ```bash
-   python3 gen_system_config.py
-   ```
-
-   This will create or update `system_config.json`.
 
 ---
 
