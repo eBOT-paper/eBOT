@@ -1,0 +1,123 @@
+#ifndef __AGG_COMMON_H
+#define __AGG_COMMON_H
+
+#include <linux/ip.h>
+#include <linux/udp.h>
+#include <arpa/inet.h>
+
+// distributed training protocol
+#define PORT {{ port }}
+#define DUMMY_IP {{ dummy_ip }}
+#define GRADIENT_SIZE {{ gradient_size }}
+#define FRAGMENT_SIZE {{ fragment_size }}
+#define PAYLOAD_SIZE (GRADIENT_SIZE * 4 + 8)
+#define WORKER_NUM {{ worker_num }}
+#define SCALE_FACTOR {{ scale_factor }}
+
+#define HOST_ID {{ host_id }}
+#define HOST_IP {{ host_ip }}
+#define HOST_MAC {{ host_mac }}
+
+#define CHILDREN_NUM {{ children_num }}
+#define CHILDREN_ID {{ children_id }}
+#define CHILDREN_IP {{ children_ip }}
+#define CHILDREN_MAC {{ children_mac }}
+
+#define PARENT_NUM {{ parent_num }}
+#define PARENT_ID {{ parent_id or 0 }}
+#define PARENT_IP {{ parent_ip or host_ip }}
+#define PARENT_MAC {{ parent_mac or host_mac }}
+
+struct agg_payload
+{
+    __u32 hid; //host_id
+    __u32 fid; //fragment_id
+    __u32 bcast; //broadcast
+    __u32 iter;
+    __u32 grads[GRADIENT_SIZE];
+};
+
+struct agg_map
+{
+    __u8 lock;
+    __u8 hcheck[WORKER_NUM];
+    __u8 lflag;
+    __u32 iter;
+    __u32 childcnt;
+    __u32 lgrads[GRADIENT_SIZE];
+    __u32 grads[GRADIENT_SIZE];
+};
+
+static void *__memcpy(void *dest, const void *src, __u32 n)
+{
+    unsigned char *d = dest;
+    const unsigned char *s = src;
+    
+    for (__u32 i = 0; i < n; i++) {
+        d[i] = s[i];
+    }
+    return dest;
+}
+
+static void *__memset(void *dest, __u32 value, __u32 n) 
+{
+    unsigned char *d = dest;
+    unsigned char v = (unsigned char)value;
+    
+    for (__u32 i = 0; i < n; i++) {
+        d[i] = v;
+    }
+    return dest;
+}
+
+static __u16 csum_fold_helper(__u64 csum)
+{
+    for (__u16 i = 0; i < 4; i++) {
+        if (csum >> 16)
+            csum = (csum & 0xffff) + (csum >> 16);
+    }
+    return ~csum;
+}
+
+static void compute_ipv4_csum(struct iphdr *ip)
+{
+    __u64 csum = 0;
+    
+    ip->check = 0;
+    
+    __u16 *next_iph_u16 = (__u16 *)ip;
+    for (__u16 i = 0; i < sizeof(struct iphdr)>>1; i++)
+    {
+        csum += *next_iph_u16++;
+    }
+    ip->check = csum_fold_helper(csum);
+}
+
+
+static void compute_udp_csum(struct udphdr *udp, __u32 ip_src, __u32 ip_dst)
+{
+    __u64 csum = 0;
+    
+    udp->check = 0;
+    
+    __u16 *saddr = (__u16 *)&ip_src;
+    __u16 *daddr = (__u16 *)&ip_dst;
+
+    csum += *saddr++;
+    csum += *saddr;
+
+    csum += *daddr++;
+    csum += *daddr;
+    
+    csum += htons(IPPROTO_UDP);
+    csum += udp->len; //1040
+
+    __u16 *next_u16 = (__u16 *)udp;
+    for (__u16 i = 0; i < (sizeof(struct udphdr) + PAYLOAD_SIZE)>>1; i++)
+    {
+        csum += *next_u16++;
+    }
+    udp->check = csum_fold_helper(csum);
+}
+
+#endif

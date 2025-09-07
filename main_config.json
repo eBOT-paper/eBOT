@@ -1,0 +1,27 @@
+{
+    "coord_config": {
+        "ip": "10.100.10.92",
+        "port": 8765
+    },
+    "train_config": {
+        "dummy_ip": "1.2.3.4",
+        "port": 1234,
+        "gradient_size": 350,
+        "fragment_size": 33400,
+        "learning_rate": 0.01,
+        "model_type": "resnet18",
+        "scale_factor": 1e8
+    },
+    "node_config": [
+        {"id": 0, "addr": "10.100.10.92" , "mac": "fa:16:3e:b8:44:0f", "disabled": false },
+        {"id": 1, "addr": "10.100.10.176", "mac": "fa:16:3e:e0:e9:ad", "disabled": false },
+        {"id": 2, "addr": "10.100.10.217", "mac": "fa:16:3e:c1:6e:c5", "disabled": true },
+        {"id": 3, "addr": "10.100.10.218", "mac": "fa:16:3e:bb:a0:68", "disabled": true },
+        {"id": 4, "addr": "10.100.10.211", "mac": "fa:16:3e:a3:d9:4e", "disabled": true },
+        {"id": 5, "addr": "10.100.10.234", "mac": "fa:16:3e:92:ae:1f", "disabled": true },
+        {"id": 6, "addr": "10.100.10.135", "mac": "fa:16:3e:1d:83:3f", "disabled": true },
+        {"id": 7, "addr": "10.100.10.98" , "mac": "fa:16:3e:3e:df:5f", "disabled": true },
+        {"id": 8, "addr": "10.100.10.17" , "mac": "fa:16:3e:5e:54:09", "disabled": true },
+        {"id": 9, "addr": "10.100.10.180", "mac": "fa:16:3e:bb:0b:73", "disabled": true }
+    ]
+}
